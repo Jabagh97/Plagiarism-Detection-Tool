@@ -1,0 +1,74 @@
+package com.company.GUI;
+
+import com.company.Moss.Moss;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class MainFrame extends JFrame{
+    String fileNames = " ";
+   public void createWindow() {
+        JFrame frame = new JFrame("Select Files");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        createUI(frame);
+        frame.setSize(560, 200);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    public void createUI(final JFrame frame){
+        JPanel panel = new JPanel();
+        LayoutManager layout = new FlowLayout();
+        panel.setLayout(layout);
+        JButton AddFilesButton = new JButton("Add Files");
+        JButton RunMossButton  = new JButton("Run Moss");
+        final JLabel label = new JLabel();
+        //Moss Action
+        RunMossButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+
+
+            }
+        });
+
+        //Select Action
+        AddFilesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setMultiSelectionEnabled(true);
+                int option = fileChooser.showOpenDialog(frame);
+                if(option == JFileChooser.APPROVE_OPTION){
+                    File[] files = fileChooser.getSelectedFiles();
+                    for(File file: files){
+                        fileNames += file.getName() + " ";
+                    }
+                    label.setText("File(s) Selected: " + fileNames);
+                }else{
+                    label.setText("Nothing Selected");
+                }
+            }
+        });
+
+        panel.add(AddFilesButton);
+        panel.add(RunMossButton);
+        panel.add(label);
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
+    }
+
+    public String getFileNames(){
+       return fileNames;
+    }
+}
