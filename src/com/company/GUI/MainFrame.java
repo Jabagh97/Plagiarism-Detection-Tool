@@ -1,19 +1,10 @@
 package com.company.GUI;
 
-import com.company.Moss.Moss;
-
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.LayoutManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class MainFrame extends JFrame{
     String fileNames = " ";
@@ -37,8 +28,7 @@ public class MainFrame extends JFrame{
         RunMossButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-
+                MossResults mossResults = new MossResults();
 
             }
         });

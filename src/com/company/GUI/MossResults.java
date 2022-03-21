@@ -7,15 +7,15 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import java.awt.Color;
-import java.awt.EventQueue;
+import javax.swing.*;
+import java.awt.*;
 
 public class MossResults extends JFrame {
 
     public MossResults() {
         initUI();
+        setVisible(true);
+
     }
 
     private void initUI() {
@@ -31,6 +31,8 @@ public class MossResults extends JFrame {
         pack();
         setTitle("Moss chart");
         setLocationRelativeTo(null);
+
+
 
     }
 
@@ -56,12 +58,5 @@ public class MossResults extends JFrame {
         return barChart;
     }
 
-    public static void main(String[] args) {
 
-        EventQueue.invokeLater(() -> {
-
-            var ex = new MossResults();
-            ex.setVisible(true);
-        });
-    }
 }
