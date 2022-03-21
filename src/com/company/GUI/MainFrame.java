@@ -29,7 +29,6 @@ public class MainFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 MossResults mossResults = new MossResults();
-
             }
         });
 
@@ -62,3 +61,5 @@ public class MainFrame extends JFrame{
        return fileNames;
     }
 }
+
+//TODO: Organize, make it more Professional, and add Zip file feature

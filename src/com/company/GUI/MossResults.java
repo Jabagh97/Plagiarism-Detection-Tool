@@ -11,42 +11,36 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MossResults extends JFrame {
-
+    JButton next = new JButton("Next");
+    JTextField threshHold = new JTextField("Enter Thresh hold");
     public MossResults() {
         initUI();
         setVisible(true);
-
     }
 
     private void initUI() {
-
+        LayoutManager layout = new FlowLayout();
+        setLayout(layout);
         CategoryDataset dataset = createDataset();
-
         JFreeChart chart = createChart(dataset);
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         chartPanel.setBackground(Color.white);
-        add(chartPanel);
-
         pack();
         setTitle("Moss chart");
-        setLocationRelativeTo(null);
-
-
+        add(chartPanel);
+        add(next);
+        add(threshHold);
 
     }
 
     private CategoryDataset createDataset() {
-
         var dataset = new DefaultCategoryDataset();
         dataset.setValue(50, "", "80");
-
-
         return dataset;
     }
 
     private JFreeChart createChart(CategoryDataset dataset) {
-
         JFreeChart barChart = ChartFactory.createBarChart(
                 "Moss Results",
                 "Similarity",
@@ -54,9 +48,10 @@ public class MossResults extends JFrame {
                 dataset,
                 PlotOrientation.VERTICAL,
                 false, true, false);
-
         return barChart;
     }
 
 
 }
+
+//TODO: Organize Components, get real results from MOSS, and use threshHold
