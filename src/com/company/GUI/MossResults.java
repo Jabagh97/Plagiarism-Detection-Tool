@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class MossResults extends JFrame {
     JButton next = new JButton("Next");
-    JTextField threshHold = new JTextField("Enter Thresh hold");
+    JTextField threshHold = new JTextField("Enter Threshold");
     public MossResults() {
         initUI();
         setVisible(true);

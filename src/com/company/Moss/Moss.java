@@ -55,11 +55,17 @@ public class Moss {
     //Get Result URL
      void getUrl(String cmdOutput)
     {
+        int index = cmdOutput.indexOf(":")-4; //this finds the first occurrence of "."
+        String url = cmdOutput.substring(index);
 
     }
     //Get Similarity Percentage
      void getPercentage(String input)
     {
+        int index = input.indexOf(" ");
+        String simPercent = input.substring(index);
+        simPercent = simPercent.substring(2,simPercent.length()-4);
+        int output = Integer.parseInt(simPercent);
 
     }
     //Get File Names
