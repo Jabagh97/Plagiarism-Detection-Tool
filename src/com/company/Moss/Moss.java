@@ -1,8 +1,8 @@
 package com.company.Moss;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 class Pairs {
     String file1;
@@ -28,11 +28,17 @@ class Pairs {
     }
 }
 
-public class Moss {
+public class Moss  {
+
+    public String fileNames="";
+    String file = "";
+    String path = "";
+    String filesPathCommand = "cd ";
+    String mossCommand = "perl moss.pl -l cc ";
     //Parsing Command Output
-     void exec(String command) throws IOException {
+    /* void exec() throws IOException {
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(command);
+        Process proc = rt.exec("cd \"C:\\Users\\Jabagh angok\\OneDrive\\Documents\\aDummy\" && dir");
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
         BufferedReader stdError = new BufferedReader(new
@@ -52,6 +58,22 @@ public class Moss {
         }
 
 }
+*/
+    public void execute() throws Exception {
+        System.out.println(filesPathCommand);
+        System.out.println(mossCommand);
+        ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c",mossCommand);
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while (true) {
+            line = r.readLine();
+            if (line == null) { break; }
+            System.out.println(line);
+        }
+    }
     //Get Result URL
      void getUrl(String cmdOutput)
     {
@@ -76,14 +98,34 @@ public class Moss {
         String output = input.substring(0, pos);
         return output;
     }
-     void runMoss(){
-        String filesPathCommand = "cd ";
-        String mossCommand = "perl moss.pl -l cc ";
-
-
+    public void setFilesName(String filesName){
+         fileNames=filesName;
+    }
+    public void setPath(String path){
+        this.path=path;
     }
 
 
+     public void runMoss() throws Exception {
+         //cd to files path
+         ArrayList<String> names = new ArrayList<>();
+         int index = path.lastIndexOf('\\');
+         path = path.substring(0,index);
+
+         //Getting the files path
+         filesPathCommand += path;
+         //Completing Moss command with file names
+         mossCommand += fileNames;
+
+         //Storing file names in a list
+         for(String s :fileNames.split(" ")){
+             names.add(s);
+             System.out.println(s);
+         }
 
 
+         execute();
+
+
+     }
 }
