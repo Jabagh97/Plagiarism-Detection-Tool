@@ -1,18 +1,19 @@
 package com.company.GUI;
 
 import com.company.Moss.Moss;
+import com.company.XML.Parser;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 
 public class MainFrame extends JFrame{
     public String fileNames = "";
     public String path ="";
     public Moss moss = new Moss();
+    public Parser parser = new Parser();
    public void createWindow() {
         JFrame frame = new JFrame("Select Files");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,7 +29,15 @@ public class MainFrame extends JFrame{
         panel.setLayout(layout);
         JButton AddFilesButton = new JButton("Add Files");
         JButton RunMossButton  = new JButton("Run Moss");
+        JButton TestParserButton  = new JButton("Test Parser");
+
         final JLabel label = new JLabel();
+        TestParserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    parser.run();
+            }
+        });
         //Moss Action
         RunMossButton.addActionListener(new ActionListener() {
             @Override
@@ -36,10 +45,8 @@ public class MainFrame extends JFrame{
                 MossResults mossResults = new MossResults();
                 try {
                     moss.runMoss();
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
-                } catch (Exception exception) {
-                    exception.printStackTrace();
                 }
             }
         });
@@ -70,6 +77,7 @@ public class MainFrame extends JFrame{
 
         panel.add(AddFilesButton);
         panel.add(RunMossButton);
+        panel.add(TestParserButton);
         panel.add(label);
         frame.getContentPane().add(panel, BorderLayout.CENTER);
     }

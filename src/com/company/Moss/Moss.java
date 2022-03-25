@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
 class Pairs {
     String file1;
     String file2;
@@ -62,7 +61,6 @@ public class Moss  {
         ProcessBuilder processBuilder = new ProcessBuilder().command(command);
         try {
             Process process = processBuilder.start();
-
             //read the output
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -70,14 +68,11 @@ public class Moss  {
             while ((output = bufferedReader.readLine()) != null) {
                 System.out.println(output);
             }
-
             //wait for the process to complete
             process.waitFor();
-
             //close the resources
             bufferedReader.close();
             process.destroy();
-
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -119,10 +114,16 @@ public class Moss  {
              names.add(s);
              System.out.println(s);
          }
+         //running MOSS
          execute();
+         //Saving XML file
          String curl = "curl.exe --output result.xml -L ";
          curl += url;
          System.out.println(curl);
          runCommand("cmd", "/C",curl);
+         //Clean XML file
+         String cleanCommand1 = "perl -i -pe \"s|^ *<TD ALIGN=right>||\" \"result.xml\"";
+         runCommand("cmd", "/C",cleanCommand1);
      }
+
 }
