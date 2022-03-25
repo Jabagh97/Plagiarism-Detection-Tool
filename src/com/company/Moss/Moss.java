@@ -2,6 +2,7 @@ package com.company.Moss;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -32,8 +33,9 @@ class Pairs {
 public class Moss  {
 
     public String fileNames="";
-    String file = "";
+    String url = "";
     String path = "";
+    String commandOutput ="";
     String filesPathCommand = "";
     String mossCommand = "perl moss.pl -l cc ";
 
@@ -51,13 +53,34 @@ public class Moss  {
             line = r.readLine();
             if (line == null) { break; }
             System.out.println(line);
+            commandOutput +=line;
         }
+        int index = commandOutput.lastIndexOf('h');
+        url = commandOutput.substring(index);
     }
-    //Get Result URL
-     void getUrl(String cmdOutput)
-    {
-        int index = cmdOutput.indexOf(":")-4; //this finds the first occurrence of "."
-        String url = cmdOutput.substring(index);
+    public void runCommand(String... command) {
+        ProcessBuilder processBuilder = new ProcessBuilder().command(command);
+        try {
+            Process process = processBuilder.start();
+
+            //read the output
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String output = null;
+            while ((output = bufferedReader.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            //wait for the process to complete
+            process.waitFor();
+
+            //close the resources
+            bufferedReader.close();
+            process.destroy();
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     //Get Similarity Percentage
      void getPercentage(String input)
@@ -86,16 +109,20 @@ public class Moss  {
          //cd to files path
          ArrayList<String> names = new ArrayList<>();
          int index = path.lastIndexOf('\\');
-         path = path.substring(0,index);
+         path = path.substring(0, index);
          //Getting the files path
          filesPathCommand += path;
          //Completing Moss command with file names
          mossCommand += fileNames;
          //Storing file names in a list
-         for(String s :fileNames.split(" ")){
+         for (String s : fileNames.split(" ")) {
              names.add(s);
              System.out.println(s);
          }
          execute();
+         String curl = "curl.exe --output result.xml -L ";
+         curl += url;
+         System.out.println(curl);
+         runCommand("cmd", "/C",curl);
      }
 }
