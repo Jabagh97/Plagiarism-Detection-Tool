@@ -10,7 +10,8 @@ import java.util.ArrayList;
 class Pairs {
     String file1;
     String file2;
-    int sim;
+    int sim1;
+    int sim2;
     int lineMatched;
     void setFile1(String input){
         file1 = input;
@@ -18,8 +19,11 @@ class Pairs {
     void setFile2(String input){
         file2 = input;
     }
-    void setSimilarity(int input){
-        sim = input;
+    void setSimilarity1(int input){
+        sim1 = input;
+    }
+    void setSimilarity2(int input){
+        sim2 = input;
     }
     void setLineMatched(int input){lineMatched = input;}
     String getFile1(){
@@ -28,8 +32,11 @@ class Pairs {
     String getFile2(){
         return file2;
     }
-    int getSimilarity(){
-        return sim;
+    int getSimilarity1(){
+        return sim1;
+    }
+    int getSimilarity2(){
+        return sim2;
     }
     int getLineMatched(){return lineMatched;}
 }
@@ -123,10 +130,13 @@ public class Moss  {
                 namesList.add(htmlResultV1.get(i));
             }
             if(i%2!=0){
-                similarities.add(htmlResultV1.get(i));
+                int index = htmlResultV1.get(i).lastIndexOf("%");
+                String simModified =htmlResultV1.get(i).substring(1,index)  ;
+                similarities.add(simModified);
             }
         }
     }
+
     public void organizingPairs(){
 
         System.out.println(namesList);
@@ -138,13 +148,18 @@ public class Moss  {
             pair.setFile1(namesList.get(i));
             pair.setFile2(namesList.get(i+1));
             namesList.remove(i);
-
+            pair.setSimilarity1(Integer.parseInt(similarities.get(i)));
+            pair.setSimilarity2(Integer.parseInt(similarities.get(i+1)));
+            similarities.remove(i);
 
             filePairs.add(pair);
         }
             for(int i = 0 ; i<filePairs.size() ; i++){
               System.out.print(filePairs.get(i).getFile1());
+              System.out.println(filePairs.get(i).getSimilarity1());
               System.out.print(filePairs.get(i).getFile2());
+              System.out.println(filePairs.get(i).getSimilarity2());
+              System.out.println(filePairs.get(i).getLineMatched());
             }
     }
 
