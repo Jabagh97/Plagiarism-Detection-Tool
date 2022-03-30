@@ -1,5 +1,7 @@
 package com.company.Moss;
 
+import com.company.HTML.Parser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +11,7 @@ class Pairs {
     String file1;
     String file2;
     int sim;
+    int lineMatched;
     void setFile1(String input){
         file1 = input;
     }
@@ -18,6 +21,7 @@ class Pairs {
     void setSimilarity(int input){
         sim = input;
     }
+    void setLineMatched(int input){lineMatched = input;}
     String getFile1(){
         return file1;
     }
@@ -27,6 +31,7 @@ class Pairs {
     int getSimilarity(){
         return sim;
     }
+    int getLineMatched(){return lineMatched;}
 }
 
 public class Moss  {
@@ -37,6 +42,12 @@ public class Moss  {
     String commandOutput ="";
     String filesPathCommand = "";
     String mossCommand = "perl moss.pl -l cc ";
+    public Parser parser = new Parser();
+    ArrayList<String> namesList = new ArrayList<>();
+    ArrayList<Pairs> filePairs = new ArrayList<>();
+    ArrayList<String> htmlResultV1 = new ArrayList<>();
+    ArrayList<String> linesMatched = new ArrayList<>();
+    ArrayList<String> similarities = new ArrayList<>();
 
     //Parsing Command Output
     public void execute() throws Exception {
@@ -77,53 +88,88 @@ public class Moss  {
             e.printStackTrace();
         }
     }
-    //Get Similarity Percentage
-     void getPercentage(String input)
-    {
-        int index = input.indexOf(" ");
-        String simPercent = input.substring(index);
-        simPercent = simPercent.substring(2,simPercent.length()-4);
-        int output = Integer.parseInt(simPercent);
-    }
-    //Get File Names
-     String getFileName(String input)
-    {
-        int pos;
-        pos = input.indexOf(" ");
-        String output = input.substring(0, pos);
-        return output;
-    }
     public void setFilesName(String filesName){
          fileNames=filesName;
     }
     public void setPath(String path){
         this.path=path;
     }
+    public void handleHtml(){
+        //Saving XML file
+        String curl = "curl.exe --output result.html -L ";
+        curl += url;
+        System.out.println(curl);
+        runCommand("cmd", "/C",curl);
+
+        //Clean XML file from aligns
+        String cleanCommand1 = "perl -i -pe \"s|^ *<TD ALIGN=right>||\" \"result.xml\"";
+        runCommand("cmd", "/C",cleanCommand1);
+    }
+    public void generatePairs() throws IOException {
+        //Get File Percentage and store them in pairs
+        String htmlResultText = parser.run();
+        //Adding elements one by one to a list
+        for(String s : htmlResultText.split(" ")){
+            htmlResultV1.add(s);
+        }
+        //Getting lines matched and removing it from html result
+        for (int i =4 ;i<htmlResultV1.size();i=i+4){
+            linesMatched.add(htmlResultV1.get(i));
+            htmlResultV1.remove(i);
+        }
+        //Getting File names & Similarities
+        for(int i=0;i<htmlResultV1.size();i++){
+            if(i%2==0){
+                namesList.add(htmlResultV1.get(i));
+            }
+            if(i%2!=0){
+                similarities.add(htmlResultV1.get(i));
+            }
+        }
+    }
+    public void organizingPairs(){
+
+        System.out.println(namesList);
+        System.out.println(similarities);
+        System.out.println(linesMatched);
+        for(int i = 0 ; i<linesMatched.size() ; i++){
+            Pairs pair = new Pairs();
+            pair.setLineMatched(Integer.parseInt(linesMatched.get(i)));
+            pair.setFile1(namesList.get(i));
+            pair.setFile2(namesList.get(i+1));
+            namesList.remove(i);
+
+
+            filePairs.add(pair);
+        }
+            for(int i = 0 ; i<filePairs.size() ; i++){
+              System.out.print(filePairs.get(i).getFile1());
+              System.out.print(filePairs.get(i).getFile2());
+            }
+    }
+
 
      public void runMoss() throws Exception {
          //cd to files path
-         ArrayList<String> names = new ArrayList<>();
          int index = path.lastIndexOf('\\');
          path = path.substring(0, index);
          //Getting the files path
          filesPathCommand += path;
          //Completing Moss command with file names
          mossCommand += fileNames;
-         //Storing file names in a list
-         for (String s : fileNames.split(" ")) {
-             names.add(s);
-             System.out.println(s);
-         }
+
          //running MOSS
-         execute();
-         //Saving XML file
-         String curl = "curl.exe --output result.xml -L ";
-         curl += url;
-         System.out.println(curl);
-         runCommand("cmd", "/C",curl);
-         //Clean XML file
-         String cleanCommand1 = "perl -i -pe \"s|^ *<TD ALIGN=right>||\" \"result.xml\"";
-         runCommand("cmd", "/C",cleanCommand1);
+       //  execute();
+         handleHtml();
+         generatePairs();
+         organizingPairs();
+
+
+
+
+
+
+
      }
 
 }

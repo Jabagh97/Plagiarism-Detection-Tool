@@ -1,19 +1,21 @@
 package com.company.GUI;
 
+import com.company.HTML.Parser;
 import com.company.Moss.Moss;
-import com.company.XML.Parser;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 public class MainFrame extends JFrame{
     public String fileNames = "";
     public String path ="";
     public Moss moss = new Moss();
     public Parser parser = new Parser();
+
    public void createWindow() {
         JFrame frame = new JFrame("Select Files");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,12 +34,19 @@ public class MainFrame extends JFrame{
         JButton TestParserButton  = new JButton("Test Parser");
 
         final JLabel label = new JLabel();
+
         TestParserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    parser.run();
+                try {
+                   System.out.println(parser.run());
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
+
         //Moss Action
         RunMossButton.addActionListener(new ActionListener() {
             @Override
