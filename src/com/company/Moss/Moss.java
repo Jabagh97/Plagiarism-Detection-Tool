@@ -1,7 +1,17 @@
 package com.company.Moss;
 
 import com.company.HTML.Parser;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +50,7 @@ class Pairs {
     }
     int getLineMatched(){return lineMatched;}
 }
-
 public class Moss  {
-
     public String fileNames="";
     String url = "";
     String path = "";
@@ -55,6 +63,8 @@ public class Moss  {
     ArrayList<String> htmlResultV1 = new ArrayList<>();
     ArrayList<String> linesMatched = new ArrayList<>();
     ArrayList<String> similarities = new ArrayList<>();
+    public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
+
 
     //Parsing Command Output
     public void execute() throws Exception {
@@ -136,12 +146,7 @@ public class Moss  {
             }
         }
     }
-
     public void organizingPairs(){
-
-        System.out.println(namesList);
-        System.out.println(similarities);
-        System.out.println(linesMatched);
         for(int i = 0 ; i<linesMatched.size() ; i++){
             Pairs pair = new Pairs();
             pair.setLineMatched(Integer.parseInt(linesMatched.get(i)));
@@ -155,16 +160,20 @@ public class Moss  {
             filePairs.add(pair);
         }
             for(int i = 0 ; i<filePairs.size() ; i++){
-              System.out.print(filePairs.get(i).getFile1());
-              System.out.println(filePairs.get(i).getSimilarity1());
-              System.out.print(filePairs.get(i).getFile2());
-              System.out.println(filePairs.get(i).getSimilarity2());
-              System.out.println(filePairs.get(i).getLineMatched());
+              int index ;
+              if(filePairs.get(i).getSimilarity1()>filePairs.get(i).getSimilarity2()){
+                  index = (filePairs.get(i).getSimilarity1()/10)-1;
+              }
+              else {
+                  index = (filePairs.get(i).getSimilarity2()/10)-1;
+              }
+              chartOutput[index+1]=1;
             }
+        for(int i = 1; i <= 10; i++){
+         System.out.println("number of files : " + i*10 +" "+ chartOutput[i]);
+        }
     }
-
-
-     public void runMoss() throws Exception {
+    public void runMoss() throws Exception {
          //cd to files path
          int index = path.lastIndexOf('\\');
          path = path.substring(0, index);
@@ -178,13 +187,74 @@ public class Moss  {
          handleHtml();
          generatePairs();
          organizingPairs();
-
-
-
-
-
-
-
+         MossResults mossResults = new MossResults();
      }
 
+    class MossResults extends JFrame {
+        JButton next = new JButton("Next");
+        JTextField threshHold = new JTextField("Enter Threshold");
+        int thresholdText ;
+        public MossResults() {
+            initUI();
+            setVisible(true);
+        }
+        private void initUI() {
+            JPanel panel = new JPanel();
+            add(panel);
+            CategoryDataset dataset = createDataset();
+            JFreeChart chart = createChart(dataset);
+            ChartPanel chartPanel = new ChartPanel(chart);
+            chartPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            chartPanel.setBackground(Color.white);
+            panel.add(chartPanel);
+            setTitle("MOSS chart");
+            setLocationRelativeTo(null);
+            panel.add(next);
+            panel.add(threshHold);
+            pack();
+            next.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    thresholdText = Integer.parseInt(threshHold.getText());
+                    JFrame frame = new JFrame("Pairs with specified threshold");
+                    JPanel panel = new JPanel();
+                    LayoutManager layout = new FlowLayout();
+                    panel.setLayout(layout);
+
+                }
+            });
+        }
+
+        private CategoryDataset createDataset() {
+            var dataset = new DefaultCategoryDataset();
+            dataset.setValue(chartOutput[0], "", "10");
+            dataset.setValue(chartOutput[1], "", "20");
+            dataset.setValue(chartOutput[2], "", "30");
+            dataset.setValue(chartOutput[3], "", "40");
+            dataset.setValue(chartOutput[4], "", "50");
+            dataset.setValue(chartOutput[5], "", "60");
+            dataset.setValue(chartOutput[6], "", "70");
+            dataset.setValue(chartOutput[7], "", "80");
+            dataset.setValue(chartOutput[8], "", "90");
+            dataset.setValue(chartOutput[9], "", "100");
+            return dataset;
+        }
+
+        private JFreeChart createChart(CategoryDataset dataset) {
+            JFreeChart barChart = ChartFactory.createBarChart(
+                    "Moss Results",
+                    "Similarity",
+                    "Number of Pairs",
+                    dataset,
+                    PlotOrientation.VERTICAL,
+                    false, true, false);
+            return barChart;
+        }
+
+
+
+    }
 }
+
+
+//TODO:Apply Pairs thing to the GUI

@@ -24,7 +24,6 @@ public class MainFrame extends JFrame{
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-
     public void createUI(final JFrame frame){
         JPanel panel = new JPanel();
         LayoutManager layout = new FlowLayout();
@@ -32,9 +31,7 @@ public class MainFrame extends JFrame{
         JButton AddFilesButton = new JButton("Add Files");
         JButton RunMossButton  = new JButton("Run Moss");
         JButton TestParserButton  = new JButton("Test Parser");
-
         final JLabel label = new JLabel();
-
         TestParserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -51,8 +48,8 @@ public class MainFrame extends JFrame{
         RunMossButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MossResults mossResults = new MossResults();
-                try {
+
+            try {
                     moss.runMoss();
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -83,14 +80,12 @@ public class MainFrame extends JFrame{
                 }
             }
         });
-
         panel.add(AddFilesButton);
         panel.add(RunMossButton);
         panel.add(TestParserButton);
         panel.add(label);
         frame.getContentPane().add(panel, BorderLayout.CENTER);
     }
-
     public String getFileNames(){
        return fileNames;
     }
