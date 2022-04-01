@@ -36,7 +36,8 @@ public class MainFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                   System.out.println(parser.run());
+                   System.out.println(parser.getFilesLink());
+
 
                 } catch (IOException ex) {
                     ex.printStackTrace();

@@ -1,5 +1,6 @@
 package com.company.Moss;
 
+import com.company.HTML.JHyperlink;
 import com.company.HTML.Parser;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+
 class Pairs {
     String file1;
     String file2;
@@ -63,6 +66,7 @@ public class Moss  {
     ArrayList<String> htmlResultV1 = new ArrayList<>();
     ArrayList<String> linesMatched = new ArrayList<>();
     ArrayList<String> similarities = new ArrayList<>();
+    List<String> filesCompare  ;
     public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
 
 
@@ -124,7 +128,7 @@ public class Moss  {
     }
     public void generatePairs() throws IOException {
         //Get File Percentage and store them in pairs
-        String htmlResultText = parser.run();
+        String htmlResultText = parser.getText();
         //Adding elements one by one to a list
         for(String s : htmlResultText.split(" ")){
             htmlResultV1.add(s);
@@ -192,7 +196,7 @@ public class Moss  {
 
     class MossResults extends JFrame {
         JButton next = new JButton("Next");
-        JTextField threshHold = new JTextField("Enter Threshold");
+        JTextField threshHold = new JTextField("Threshold");
         int thresholdText ;
         public MossResults() {
             initUI();
@@ -215,12 +219,30 @@ public class Moss  {
             next.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    //Create a new window
                     thresholdText = Integer.parseInt(threshHold.getText());
-                    JFrame frame = new JFrame("Pairs with specified threshold");
-                    JPanel panel = new JPanel();
+                    remove(panel);
+                    JPanel panel2 = new JPanel();
                     LayoutManager layout = new FlowLayout();
-                    panel.setLayout(layout);
+                    panel2.setLayout(layout);
+                    panel2.setSize(800,800);
+                    //ADD files and descriptions here after getting the threshold.
+                    try {
+                        filesCompare = parser.getFilesLink();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    for(int i =0 ; i<filePairs.size();i++){
+                        if(filePairs.get(i).getSimilarity1()>=thresholdText||filePairs.get(i).getSimilarity2()>=thresholdText){
+                            JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1());
+                            linkWebsite.setURL(filesCompare.get(i));
+                            panel2.add(linkWebsite);
+                        }
 
+                    }
+                    add(panel2);
+                    setLocationRelativeTo(null);
+                    pack();
                 }
             });
         }
