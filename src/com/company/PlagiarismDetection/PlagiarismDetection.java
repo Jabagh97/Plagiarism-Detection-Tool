@@ -1,4 +1,4 @@
-package com.company.Moss;
+package com.company.PlagiarismDetection;
 
 import com.company.HTML.JHyperlink;
 import com.company.HTML.Parser;
@@ -53,13 +53,15 @@ class Pairs {
     }
     int getLineMatched(){return lineMatched;}
 }
-public class Moss  {
+public class PlagiarismDetection {
     public String fileNames="";
     String url = "";
     String path = "";
     String commandOutput ="";
+    String cppCommandOutput = "<html>";
     String filesPathCommand = "";
     String mossCommand = "perl moss.pl -l cc ";
+    String cppCheckCommandStyle = "cppcheck --enable=style";
     public Parser parser = new Parser();
     ArrayList<String> namesList = new ArrayList<>();
     ArrayList<Pairs> filePairs = new ArrayList<>();
@@ -68,7 +70,6 @@ public class Moss  {
     ArrayList<String> similarities = new ArrayList<>();
     List<String> filesCompare  ;
     public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
-
 
     //Parsing Command Output
     public void execute() throws Exception {
@@ -187,7 +188,7 @@ public class Moss  {
          mossCommand += fileNames;
 
          //running MOSS
-       //  execute();
+      //   execute();
          handleHtml();
          generatePairs();
          organizingPairs();
@@ -226,6 +227,7 @@ public class Moss  {
                     LayoutManager layout = new FlowLayout();
                     panel2.setLayout(layout);
                     panel2.setSize(800,800);
+                    JButton cpp =  new JButton("Run Cpp Check ");
                     //ADD files and descriptions here after getting the threshold.
                     try {
                         filesCompare = parser.getFilesLink();
@@ -237,16 +239,28 @@ public class Moss  {
                             JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1());
                             linkWebsite.setURL(filesCompare.get(i));
                             panel2.add(linkWebsite);
+                            cppCheckCommandStyle = cppCheckCommandStyle + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
                         }
-
                     }
+                    cpp.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            //CPP check Related Results
+                            CppCheckResults results = new CppCheckResults();
+                            try {
+                                results.runCppCheck();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    });
                     add(panel2);
+                    panel2.add(cpp);
                     setLocationRelativeTo(null);
                     pack();
                 }
             });
         }
-
         private CategoryDataset createDataset() {
             var dataset = new DefaultCategoryDataset();
             dataset.setValue(chartOutput[0], "", "10");
@@ -261,7 +275,6 @@ public class Moss  {
             dataset.setValue(chartOutput[9], "", "100");
             return dataset;
         }
-
         private JFreeChart createChart(CategoryDataset dataset) {
             JFreeChart barChart = ChartFactory.createBarChart(
                     "Moss Results",
@@ -272,11 +285,38 @@ public class Moss  {
                     false, true, false);
             return barChart;
         }
-
-
-
+    }
+    class CppCheckResults extends JFrame{
+        //Parsing Command Output
+        public void execute() throws Exception {
+            ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", cppCheckCommandStyle);
+            builder.directory(new File(filesPathCommand));
+            builder.redirectErrorStream(true);
+            Process p = builder.start();
+            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while (true) {
+                line = r.readLine();
+                if (line == null) { break; }
+                System.out.println(line);
+                cppCommandOutput = cppCommandOutput + line + "<br/>";
+            }
+            cppCommandOutput +="</html>";
+        }
+        public void createWindow(){
+            JPanel panel = new JPanel();
+            add(panel);
+            JLabel analysis = new JLabel(cppCommandOutput);
+            panel.add(analysis);
+            pack();
+            setVisible(true);
+        }
+        public void runCppCheck() throws Exception{
+            execute();
+            createWindow();
+        }
     }
 }
 
 
-//TODO:Apply Pairs thing to the GUI
+//TODO:Add Cpp Check
