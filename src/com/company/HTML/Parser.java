@@ -23,6 +23,9 @@ public class Parser {
         String relHref = link.attr("href"); // == "/"
         List<String> absHref = link.eachAttr("href");
         for(int i = 1 ; i<7 ;i++){ absHref.remove(0);}
+        for(int i = 0 ; i<absHref.size() ;i+=2){ absHref.remove(i);}
+        absHref.remove(2);
+
         return absHref;
     }
 

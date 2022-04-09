@@ -188,11 +188,12 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-      //   execute();
+        // execute();
          handleHtml();
          generatePairs();
          organizingPairs();
          MossResults mossResults = new MossResults();
+
      }
 
     class MossResults extends JFrame {
@@ -234,12 +235,18 @@ public class PlagiarismDetection {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+
+                        System.out.println(filesCompare);
                     for(int i =0 ; i<filePairs.size();i++){
                         if(filePairs.get(i).getSimilarity1()>=thresholdText||filePairs.get(i).getSimilarity2()>=thresholdText){
-                            JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1());
+                            JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1() + " &" + filePairs.get(i).getFile2());
+                          //  JHyperlink linkWebsite2 = new JHyperlink(filePairs.get(i).getFile2());
                             linkWebsite.setURL(filesCompare.get(i));
+                            //linkWebsite2.setURL(filesCompare.get(i));
                             panel2.add(linkWebsite);
+                          //  panel2.add(linkWebsite2);
                             cppCheckCommandStyle = cppCheckCommandStyle + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
+                           // System.out.println(cppCheckCommandStyle);
                         }
                     }
                     cpp.addActionListener(new ActionListener() {
