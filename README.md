@@ -2,4 +2,4 @@
 
 Senior Graduation Project 
 
-Plagirism Detection Tool to be used in course assignments 
+Plagiarism Detection Tool to be used in course assignments 
