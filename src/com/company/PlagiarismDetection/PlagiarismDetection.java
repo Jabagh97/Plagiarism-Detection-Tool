@@ -23,6 +23,7 @@ import java.util.List;
 class Pairs {
     String file1;
     String file2;
+    String analysisResult;
     int sim1;
     int sim2;
     int lineMatched;
@@ -74,7 +75,7 @@ public class PlagiarismDetection {
     //Parsing Command Output
     public void execute() throws Exception {
         //System.out.println(filesPathCommand);
-        //System.out.println(mossCommand);
+
         ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", mossCommand);
         builder.directory(new File(filesPathCommand));
         builder.redirectErrorStream(true);
@@ -89,6 +90,7 @@ public class PlagiarismDetection {
         }
         int index = commandOutput.lastIndexOf('h');
         url = commandOutput.substring(index);
+       // System.out.println(mossCommand);
     }
     public void runCommand(String... command) {
         ProcessBuilder processBuilder = new ProcessBuilder().command(command);
@@ -164,6 +166,7 @@ public class PlagiarismDetection {
 
             filePairs.add(pair);
         }
+
             for(int i = 0 ; i<filePairs.size() ; i++){
               int index ;
               if(filePairs.get(i).getSimilarity1()>filePairs.get(i).getSimilarity2()){
@@ -172,11 +175,12 @@ public class PlagiarismDetection {
               else {
                   index = (filePairs.get(i).getSimilarity2()/10)-1;
               }
-              chartOutput[index+1]=1;
+              chartOutput[index+1]+=1;
             }
         for(int i = 1; i <= 10; i++){
          System.out.println("number of files : " + i*10 +" "+ chartOutput[i]);
         }
+        System.out.println("Total Pairs : " + filePairs.size());
     }
     public void runMoss() throws Exception {
          //cd to files path
@@ -188,14 +192,13 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-        // execute();
+       //  execute();
          handleHtml();
          generatePairs();
          organizingPairs();
          MossResults mossResults = new MossResults();
 
      }
-
     class MossResults extends JFrame {
         JButton next = new JButton("Next");
         JTextField threshHold = new JTextField("Threshold");
@@ -326,4 +329,3 @@ public class PlagiarismDetection {
 }
 
 
-//TODO:Add Cpp Check

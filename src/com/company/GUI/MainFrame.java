@@ -80,14 +80,29 @@ public class MainFrame extends JFrame{
         ProcessFiles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setMultiSelectionEnabled(true);
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                int option = fileChooser.showOpenDialog(frame);
+                if(option == JFileChooser.APPROVE_OPTION){
+                    File[] files = fileChooser.getSelectedFiles();
+                    java.io.File f = fileChooser.getSelectedFile();
+                    path = f.getPath();
+                    for(File file: files){
+                        fileNames += file.getName() + " ";
+                    }
+                    label.setText("File(s) Selected: " + fileNames);
+                }else{
+                    label.setText("Nothing Selected");
+                }
 
                 try {
+
                     FileProcessing fileProcessing = new FileProcessing(path);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-
-                //TODO: add a dialog or message showing that the operation is done
+                fileNames="";
             }
         });
         panel.add(AddFilesButton);
