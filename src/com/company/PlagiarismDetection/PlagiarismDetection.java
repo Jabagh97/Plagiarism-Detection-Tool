@@ -70,6 +70,11 @@ public class PlagiarismDetection {
     ArrayList<String> linesMatched = new ArrayList<>();
     ArrayList<String> similarities = new ArrayList<>();
     List<String> filesCompare  ;
+    String simModified ="";
+    String htmlResultText="";
+    String output = null;
+
+
     public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
 
     //Parsing Command Output
@@ -99,7 +104,6 @@ public class PlagiarismDetection {
             //read the output
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String output = null;
             while ((output = bufferedReader.readLine()) != null) {
                 System.out.println(output);
             }
@@ -131,7 +135,7 @@ public class PlagiarismDetection {
     }
     public void generatePairs() throws IOException {
         //Get File Percentage and store them in pairs
-        String htmlResultText = parser.getText();
+        htmlResultText = parser.getText();
         //Adding elements one by one to a list
         for(String s : htmlResultText.split(" ")){
             htmlResultV1.add(s);
@@ -148,7 +152,7 @@ public class PlagiarismDetection {
             }
             if(i%2!=0){
                 int index = htmlResultV1.get(i).lastIndexOf("%");
-                String simModified =htmlResultV1.get(i).substring(1,index)  ;
+                simModified =htmlResultV1.get(i).substring(1,index)  ;
                 similarities.add(simModified);
             }
         }
@@ -192,12 +196,16 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-       //  execute();
-         handleHtml();
-         generatePairs();
-         organizingPairs();
-         MossResults mossResults = new MossResults();
-
+         execute();
+         if(!commandOutput.contains("No such file or directory")) {
+             handleHtml();
+             generatePairs();
+             organizingPairs();
+             MossResults mossResults = new MossResults();
+         }
+         else {
+             System.out.println("ADD MOSS Script to the files directory");
+         }
      }
     class MossResults extends JFrame {
         JButton next = new JButton("Next");
@@ -299,6 +307,8 @@ public class PlagiarismDetection {
     class CppCheckResults extends JFrame{
         //Parsing Command Output
         public void execute() throws Exception {
+            System.out.println(cppCheckCommandStyle);
+            System.out.println(filesPathCommand);
             ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", cppCheckCommandStyle);
             builder.directory(new File(filesPathCommand));
             builder.redirectErrorStream(true);

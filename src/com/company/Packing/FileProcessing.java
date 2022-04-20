@@ -69,9 +69,7 @@ public class FileProcessing {
                  int index = dir.getName().lastIndexOf('.');
                  String modifiedName = dir.getName().substring(0,index);
                  String finalName = destDirectory + dirFolder.getName()+"\\"+modifiedName+temp;
-                 System.out.println(finalName);
                  dir.renameTo(new File(finalName));
-
              }
          }
     }

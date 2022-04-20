@@ -16,7 +16,8 @@ public class MainFrame extends JFrame{
     public String path ="";
     public PlagiarismDetection moss = new PlagiarismDetection();
     public Parser parser = new Parser();
-   public void createWindow() {
+    String projectPath = System.getProperty("user.dir") + "\\moss.pl";
+    public void createWindow() {
         JFrame frame = new JFrame("Select Files");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         createUI(frame);
@@ -52,12 +53,14 @@ public class MainFrame extends JFrame{
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            moss = new PlagiarismDetection();
             }
         });
         //Select Action
         AddFilesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println(projectPath);
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(true);
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -69,13 +72,18 @@ public class MainFrame extends JFrame{
                     for(File file: files){
                         fileNames += file.getName() + " ";
                     }
+                    System.out.println(path.substring(0,path.lastIndexOf('\\')));
+                    File dir = new File(projectPath);
+                    dir.renameTo(new File(path.substring(0,path.lastIndexOf('\\')) + "\\moss.pl"));
                     moss.setFilesName(fileNames);
                     moss.setPath(path);
                     label.setText("File(s) Selected: " + fileNames);
                 }else{
                     label.setText("Nothing Selected");
                 }
+                fileNames = "";
             }
+
         });
         ProcessFiles.addActionListener(new ActionListener() {
             @Override
