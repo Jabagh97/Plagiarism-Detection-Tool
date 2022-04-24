@@ -13,6 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +64,8 @@ public class PlagiarismDetection {
     String cppCommandOutput = "<html>";
     String filesPathCommand = "";
     String mossCommand = "perl moss.pl -l cc ";
-    String cppCheckCommandStyle = "cppcheck --enable=style";
+    String cppCheckCommandStyleAll = "cppcheck --enable=style";
+    String cppCheckCommandStyleAllSpec ="cppcheck --enable=style";
     public Parser parser = new Parser();
     ArrayList<String> namesList = new ArrayList<>();
     ArrayList<Pairs> filePairs = new ArrayList<>();
@@ -70,17 +73,16 @@ public class PlagiarismDetection {
     ArrayList<String> linesMatched = new ArrayList<>();
     ArrayList<String> similarities = new ArrayList<>();
     List<String> filesCompare  ;
+    ArrayList<String> cppCommands = new ArrayList<>() ;
     String simModified ="";
     String htmlResultText="";
     String output = null;
-
-
+    int temp =0 ;
     public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
 
     //Parsing Command Output
     public void execute() throws Exception {
         //System.out.println(filesPathCommand);
-
         ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", mossCommand);
         builder.directory(new File(filesPathCommand));
         builder.redirectErrorStream(true);
@@ -196,8 +198,11 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-         execute();
+        // execute();
          if(!commandOutput.contains("No such file or directory")) {
+             //Delete Moss scripts from folder when analysis is done
+             File dirDelete = new File(path + "\\moss.pl");
+             dirDelete.delete();
              handleHtml();
              generatePairs();
              organizingPairs();
@@ -239,37 +244,54 @@ public class PlagiarismDetection {
                     LayoutManager layout = new FlowLayout();
                     panel2.setLayout(layout);
                     panel2.setSize(800,800);
-                    JButton cpp =  new JButton("Run Cpp Check ");
+                    JButton cpp =  new JButton("Run Cpp Check for threshold files ");
                     //ADD files and descriptions here after getting the threshold.
                     try {
                         filesCompare = parser.getFilesLink();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-
                         System.out.println(filesCompare);
                     for(int i =0 ; i<filePairs.size();i++){
                         if(filePairs.get(i).getSimilarity1()>=thresholdText||filePairs.get(i).getSimilarity2()>=thresholdText){
+                            temp = i;
                             JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1() + " &" + filePairs.get(i).getFile2());
                           //  JHyperlink linkWebsite2 = new JHyperlink(filePairs.get(i).getFile2());
                             linkWebsite.setURL(filesCompare.get(i));
+                            cppCommands.add(cppCheckCommandStyleAllSpec + " " + filePairs.get(i).getFile1() + " " + filePairs.get(i).getFile2());
+                            linkWebsite.addMouseListener(new MouseListener() {
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+                                    CppCheckResults results = new CppCheckResults();
+                                    try {
+                                        results.runCppCheck(cppCommands.get(temp));
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                                @Override
+                                public void mousePressed(MouseEvent e) {}
+                                @Override
+                                public void mouseReleased(MouseEvent e) {}
+                                @Override
+                                public void mouseEntered(MouseEvent e) {}
+                                @Override
+                                public void mouseExited(MouseEvent e) {}
+                            });
                             //linkWebsite2.setURL(filesCompare.get(i));
                             panel2.add(linkWebsite);
                           //  panel2.add(linkWebsite2);
-                            cppCheckCommandStyle = cppCheckCommandStyle + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
+                            cppCheckCommandStyleAll = cppCheckCommandStyleAll + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
                            // System.out.println(cppCheckCommandStyle);
                         }
                     }
-                    cpp.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            //CPP check Related Results
-                            CppCheckResults results = new CppCheckResults();
-                            try {
-                                results.runCppCheck();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
+                    cpp.addActionListener(e1 -> {
+                        //CPP check Related Results
+                        CppCheckResults results = new CppCheckResults();
+                        try {
+                            results.runCppCheck(cppCheckCommandStyleAll);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
                     });
                     add(panel2);
@@ -306,10 +328,10 @@ public class PlagiarismDetection {
     }
     class CppCheckResults extends JFrame{
         //Parsing Command Output
-        public void execute() throws Exception {
-            System.out.println(cppCheckCommandStyle);
-            System.out.println(filesPathCommand);
-            ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", cppCheckCommandStyle);
+        public void execute(String command) throws Exception {
+            //System.out.println(cppCheckCommandStyleAll);
+            //System.out.println(filesPathCommand);
+            ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", command);
             builder.directory(new File(filesPathCommand));
             builder.redirectErrorStream(true);
             Process p = builder.start();
@@ -331,8 +353,8 @@ public class PlagiarismDetection {
             pack();
             setVisible(true);
         }
-        public void runCppCheck() throws Exception{
-            execute();
+        public void runCppCheck(String command) throws Exception{
+            execute(command);
             createWindow();
         }
     }

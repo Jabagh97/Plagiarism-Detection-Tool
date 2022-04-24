@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class MainFrame extends JFrame{
     public String fileNames = "";
@@ -33,6 +35,7 @@ public class MainFrame extends JFrame{
         JButton RunMossButton  = new JButton("Run Moss");
         JButton TestParserButton  = new JButton("Test Parser");
         JButton ProcessFiles = new JButton("Process and Organize Files");
+        JButton newLook = new JButton("Design");
         final JLabel label = new JLabel();
         TestParserButton.addActionListener(new ActionListener() {
             @Override
@@ -60,7 +63,6 @@ public class MainFrame extends JFrame{
         AddFilesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(projectPath);
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(true);
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -72,9 +74,14 @@ public class MainFrame extends JFrame{
                     for(File file: files){
                         fileNames += file.getName() + " ";
                     }
-                    System.out.println(path.substring(0,path.lastIndexOf('\\')));
+                    //Coping Moss Script to the files Folder
                     File dir = new File(projectPath);
-                    dir.renameTo(new File(path.substring(0,path.lastIndexOf('\\')) + "\\moss.pl"));
+                    File dirTarget = new File(path.substring(0,path.lastIndexOf('\\')) + "\\moss.pl");
+                    try {
+                        Files.copy(dir.toPath(),dirTarget.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                     moss.setFilesName(fileNames);
                     moss.setPath(path);
                     label.setText("File(s) Selected: " + fileNames);
@@ -113,11 +120,18 @@ public class MainFrame extends JFrame{
                 fileNames="";
             }
         });
+        newLook.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         panel.add(AddFilesButton);
         panel.add(RunMossButton);
         panel.add(TestParserButton);
         panel.add(ProcessFiles);
         panel.add(label);
+        panel.add(newLook);
         frame.getContentPane().add(panel, BorderLayout.CENTER);
     }
     public String getFileNames(){
@@ -126,4 +140,3 @@ public class MainFrame extends JFrame{
     public String getPath(){return path;}
 }
 
-//TODO: Organize, make it more Professional, and add Zip file feature
