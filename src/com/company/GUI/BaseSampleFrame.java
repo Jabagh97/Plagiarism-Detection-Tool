@@ -13,20 +13,23 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.Vector;
 
 
 public class BaseSampleFrame extends JFrame {
 
-    public String fileNames = "";
-    public String path ="";
-    public PlagiarismDetection moss = new PlagiarismDetection();
+    public static String fileNames = "";
+    public static String path ="";
+    public static PlagiarismDetection moss = new PlagiarismDetection();
     public Parser parser = new Parser();
     String projectPath = System.getProperty("user.dir") + "\\moss.pl";
 
@@ -41,14 +44,18 @@ public class BaseSampleFrame extends JFrame {
 
     public BaseSampleFrame(String title) {
         super(title);
-
         // Setup menu
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
         menu.setMnemonic('F');
         JMenuItem menuItem = new JMenuItem("New");
         menuItem.setMnemonic('N');
-        menuItem.setEnabled(false);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         menu.add(menuItem);
         menuItem = new JMenuItem("Open...");
         menuItem.setMnemonic('O');
@@ -75,7 +82,7 @@ public class BaseSampleFrame extends JFrame {
                     }
                     moss.setFilesName(fileNames);
                     moss.setPath(path);
-                    JOptionPane.showMessageDialog(BaseSampleFrame.this, "Your selection: " + fc.getSelectedFile().getName());
+                    JOptionPane.showMessageDialog(BaseSampleFrame.this, "You Selected : " + Arrays.stream(fc.getSelectedFiles()).count()+ " Files");
                     fileNames = "";
                 }
             }
@@ -106,12 +113,11 @@ public class BaseSampleFrame extends JFrame {
         setJMenuBar(menuBar);
         // Setup widgets
         // Create a list with all look and feels we want to test
-        lafList = new JList(Constants.LAF_NAMES);
+        lafList = new JList();
         lafList.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         lafList.setSelectedIndex(0);
         lafList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lafListener = new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
@@ -136,8 +142,16 @@ public class BaseSampleFrame extends JFrame {
             }
         };
         lafList.addListSelectionListener(lafListener);
-        JScrollPane lafScrollPane = new JScrollPane(lafList);
-        lafScrollPane.setBorder(new TitleBorder("Projects"));
+        JLabel label = new JLabel("<html>1- Press Organize button and Select the submissions zip file<br/>" +
+                "then files will be processed and organized in separate folders <br/>" +
+                "<br/>" +
+                "2- Select processed files and run MOSS <br/>" +
+                "<br/>" +
+                "3- Enter a threshold <br/>" +
+                "<br/>" +
+                "4- Clicking on any of the links will run the Analysis tool for those pairs and view similarities results");
+        JScrollPane lafScrollPane = new JScrollPane(label);
+        lafScrollPane.setBorder(new TitleBorder("Instructions"));
         lafScrollPane.setMinimumSize(new Dimension(120, 80));
 
         contentPanel = new JPanel(new BorderLayout());
@@ -167,10 +181,10 @@ public class BaseSampleFrame extends JFrame {
         try {
             Properties props = getLAFProps();
             switch (selectedLaf) {
-                case Constants.SELECT_FILES:
-                    break;
-                case Constants.ORGANIZE :
+                case 1 :
 
+                    break;
+                case 2 :
                     break;
             }
             // Tell all components that look and feel has changed.
@@ -198,27 +212,40 @@ public class BaseSampleFrame extends JFrame {
         }
     } // end scrollSelectedToVisible
 
-    public class ScrollPaneSamplePanel extends javax.swing.JPanel {
+    public class ScrollPaneSamplePanel extends JPanel {
+
+        public Vector<String> col= new Vector<String>();
+        public Vector<String> tableRow = new Vector<String>();
+        Object [][]data = new Object[100][1] ;
+
 
         public ScrollPaneSamplePanel() {
             initComponents();
         }
+        public void setPanel (){
+            for(int i = 0 ; i <tableRow.size(); i++){
+                data[i][0]= tableRow.get(i);
 
+            }
+
+            DefaultTableModel tableModel = new DefaultTableModel(data, new String [] {"Please Extract those submissions Manually "} );
+           jTable1.setModel(tableModel);
+            //tableModel.addRow(tableRow);
+            //jTable1.setModel(tableModel);
+            jScrollPane1.setViewportView(jTable1);
+            //System.out.println("Set Panel");
+           // clear.setText("new");
+            updateUI();
+        }
         /**
          * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
          * content of this method is always regenerated by the Form Editor.
          */
         @SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-        private void initComponents() {
+        public void initComponents() {
             languages = new JLabel();
             langSelect = new JComboBox();
-            optionM = new JLabel();
-            mTextField = new JTextField();
-            optionN = new JLabel();
-            nTextField = new JTextField();
-            optionC = new JLabel();
-            cTextField = new JTextField();
             pairs = new JLabel();
             // jTextField4 = new javax.swing.JTextField();
             jScrollPane1 = new JScrollPane();
@@ -228,12 +255,14 @@ public class BaseSampleFrame extends JFrame {
             clear = new JButton();
             languages.setText("Languages:");
             langSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "C++", "Java"}));
-            optionM.setText("Option M");
-            optionN.setText("Option N");
-            optionC.setText("Option C");
-            pairs.setText("Results");
+            pairs.setText("Bad Submissions : ");
+            jScrollPane1.getViewport().setBackground(Color.gray);
+
+
             jScrollPane1.setViewportView(jTable1);
+
             organize.setText("Process Zip File");
+
             organize.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -252,6 +281,8 @@ public class BaseSampleFrame extends JFrame {
                         }
                         try {
                             FileProcessing fileProcessing = new FileProcessing(path);
+                            tableRow =fileProcessing.getBadSubmissions();
+                            setPanel();
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -264,14 +295,20 @@ public class BaseSampleFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        moss.runMoss();
+                        if(path.isEmpty()){
+                            JOptionPane.showMessageDialog(BaseSampleFrame.this,
+                                    "Please select Files first",
+                                    "error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                        else{moss.runMoss();}
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                     moss = new PlagiarismDetection();
                 }
             });
-            clear.setText("Clear");
+            clear.setText("Test");
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
             this.setLayout(layout);
             layout.setHorizontalGroup(
@@ -283,20 +320,15 @@ public class BaseSampleFrame extends JFrame {
                                             .addGroup(layout.createSequentialGroup()
                                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                             .addComponent(languages)
-                                                            .addComponent(optionM)
-                                                            .addComponent(optionC)
                                                             .addComponent(pairs))
                                                     .addGap(24, 24, 24)
                                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                            .addComponent(cTextField, GroupLayout.Alignment.LEADING)
                                                             .addGroup(layout.createSequentialGroup()
                                                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                                             .addComponent(langSelect, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                            .addComponent(mTextField))
-                                                                    .addGap(18, 18, 18)
-                                                                    .addComponent(optionN)
+                                                                    .addGap(18, 18, 18))
                                                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                    .addComponent(nTextField))
+                                                                   )
                                                     )
                                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
@@ -315,15 +347,9 @@ public class BaseSampleFrame extends JFrame {
                                             .addComponent(organize))
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(optionM)
-                                            .addComponent(mTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(optionN)
-                                            .addComponent(nTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                             .addComponent(runMoss))
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(optionC)
-                                            .addComponent(cTextField, GroupLayout.PREFERRED_SIZE,GroupLayout.DEFAULT_SIZE,GroupLayout.PREFERRED_SIZE)
                                             .addComponent(clear))
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -334,24 +360,15 @@ public class BaseSampleFrame extends JFrame {
                                     .addContainerGap())
             );
         }// </editor-fold>//GEN-END:initComponents
-
-
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private JButton organize;
         private JButton runMoss;
-        private JButton clear;
+        public JButton clear;
         private JComboBox langSelect;
         private JLabel languages;
-        private JLabel optionM;
-        private JLabel optionN;
-        private JLabel optionC;
         private JLabel pairs;
-        private JScrollPane jScrollPane1;
-        private JTable jTable1;
-        private JTextField mTextField;
-        private JTextField nTextField;
-        private JTextField cTextField;
-        private JTextField jTextField4;
+        public JScrollPane jScrollPane1;
+        public JTable jTable1;
         // End of variables declaration//GEN-END:variables
     }
 

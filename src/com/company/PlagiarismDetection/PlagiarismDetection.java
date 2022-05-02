@@ -10,6 +10,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 class Pairs {
     String file1;
@@ -64,8 +66,8 @@ public class PlagiarismDetection {
     String cppCommandOutput = "<html>";
     String filesPathCommand = "";
     String mossCommand = "perl moss.pl -l cc ";
-    String cppCheckCommandStyleAll = "cppcheck --enable=style";
-    String cppCheckCommandStyleAllSpec ="cppcheck --enable=style";
+    String cppCheckCommandStyleAll = "cppcheck --enable=all";
+    String cppCheckCommandStyleAllSpec ="cppcheck --enable=all";
     public Parser parser = new Parser();
     ArrayList<String> namesList = new ArrayList<>();
     ArrayList<Pairs> filePairs = new ArrayList<>();
@@ -198,6 +200,7 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
+
         // execute();
          if(!commandOutput.contains("No such file or directory")) {
              //Delete Moss scripts from folder when analysis is done
@@ -225,9 +228,10 @@ public class PlagiarismDetection {
             add(panel);
             CategoryDataset dataset = createDataset();
             JFreeChart chart = createChart(dataset);
+            chart.setBackgroundPaint(Color.lightGray);
             ChartPanel chartPanel = new ChartPanel(chart);
             chartPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            chartPanel.setBackground(Color.white);
+            chartPanel.setBackground(Color.darkGray);
             panel.add(chartPanel);
             setTitle("MOSS chart");
             setLocationRelativeTo(null);
@@ -239,65 +243,8 @@ public class PlagiarismDetection {
                 public void actionPerformed(ActionEvent e) {
                     //Create a new window
                     thresholdText = Integer.parseInt(threshHold.getText());
-                    remove(panel);
-                    JPanel panel2 = new JPanel();
-                    LayoutManager layout = new FlowLayout();
-                    panel2.setLayout(layout);
-                    panel2.setSize(800,800);
-                    JButton cpp =  new JButton("Run Cpp Check for threshold files ");
-                    //ADD files and descriptions here after getting the threshold.
-                    try {
-                        filesCompare = parser.getFilesLink();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                        System.out.println(filesCompare);
-                    for(int i =0 ; i<filePairs.size();i++){
-                        if(filePairs.get(i).getSimilarity1()>=thresholdText||filePairs.get(i).getSimilarity2()>=thresholdText){
-                            temp = i;
-                            JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1() + " &" + filePairs.get(i).getFile2());
-                          //  JHyperlink linkWebsite2 = new JHyperlink(filePairs.get(i).getFile2());
-                            linkWebsite.setURL(filesCompare.get(i));
-                            cppCommands.add(cppCheckCommandStyleAllSpec + " " + filePairs.get(i).getFile1() + " " + filePairs.get(i).getFile2());
-                            linkWebsite.addMouseListener(new MouseListener() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    CppCheckResults results = new CppCheckResults();
-                                    try {
-                                        results.runCppCheck(cppCommands.get(temp));
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-                                }
-                                @Override
-                                public void mousePressed(MouseEvent e) {}
-                                @Override
-                                public void mouseReleased(MouseEvent e) {}
-                                @Override
-                                public void mouseEntered(MouseEvent e) {}
-                                @Override
-                                public void mouseExited(MouseEvent e) {}
-                            });
-                            //linkWebsite2.setURL(filesCompare.get(i));
-                            panel2.add(linkWebsite);
-                          //  panel2.add(linkWebsite2);
-                            cppCheckCommandStyleAll = cppCheckCommandStyleAll + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
-                           // System.out.println(cppCheckCommandStyle);
-                        }
-                    }
-                    cpp.addActionListener(e1 -> {
-                        //CPP check Related Results
-                        CppCheckResults results = new CppCheckResults();
-                        try {
-                            results.runCppCheck(cppCheckCommandStyleAll);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-                    add(panel2);
-                    panel2.add(cpp);
-                    setLocationRelativeTo(null);
-                    pack();
+                    thresholdPairs thresholdPairs = new thresholdPairs(thresholdText);
+                    thresholdPairs.setSize(1000,800);
                 }
             });
         }
@@ -324,6 +271,119 @@ public class PlagiarismDetection {
                     PlotOrientation.VERTICAL,
                     false, true, false);
             return barChart;
+        }
+    }
+    class thresholdPairs extends JFrame {
+        JButton cpp = new JButton("Run Cpp Check for threshold files ");
+        JLabel options = new JLabel("Cpp Check analysis Options");
+        JComboBox analysis = new JComboBox();
+        JTable jTable1 = new JTable();
+        Object [][]data = new Object[100][1] ;
+        public Vector<String> col= new Vector<String>();
+        public Vector<JHyperlink> tableRow = new Vector<>();
+        thresholdPairs(int threshold) {
+            initUI(threshold);
+            setVisible(true);
+        }
+        private void initUI(int thresholdText) {
+            JScrollPane scrollPane = new JScrollPane();
+            JPanel panel = new JPanel();
+            add(panel);
+            setTitle("Threshold pairs");
+            analysis.setModel(new DefaultComboBoxModel(new String[] {"Enable all","Bug Hunting"}));
+            analysis.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    String tip ="<html>Enable All :<br/>  Enable all checks.<br/>" +
+                            "Bug Hunting :<br/> Enable noisy and soundy analysis <br/>" ;
+
+                    analysis.setToolTipText(tip);
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
+            //ADD files and descriptions here after getting the threshold.
+            try {
+                filesCompare = parser.getFilesLink();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            System.out.println(filesCompare);
+            for(int i =0 ; i<filePairs.size();i++){
+                if(filePairs.get(i).getSimilarity1()>=thresholdText||filePairs.get(i).getSimilarity2()>=thresholdText){
+                    temp = i;
+                    JHyperlink linkWebsite = new JHyperlink(filePairs.get(i).getFile1() + " &" + filePairs.get(i).getFile2());
+                    //  JHyperlink linkWebsite2 = new JHyperlink(filePairs.get(i).getFile2());
+                    linkWebsite.setURL(filesCompare.get(i));
+                    cppCommands.add(cppCheckCommandStyleAllSpec + " " + filePairs.get(i).getFile1() + " " + filePairs.get(i).getFile2());
+                    linkWebsite.addMouseListener(new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            CppCheckResults results = new CppCheckResults();
+                            try {
+                                results.runCppCheck(cppCommands.get(temp));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                        @Override
+                        public void mousePressed(MouseEvent e) {}
+                        @Override
+                        public void mouseReleased(MouseEvent e) {}
+                        @Override
+                        public void mouseEntered(MouseEvent e) {}
+                        @Override
+                        public void mouseExited(MouseEvent e) {}
+                    });
+                    tableRow.add(linkWebsite);
+                    panel.add(linkWebsite,BoxLayout.X_AXIS);
+                    cppCheckCommandStyleAll = cppCheckCommandStyleAll + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
+                    // System.out.println(cppCheckCommandStyle);
+                }
+            }
+            cpp.addActionListener(e1 -> {
+                //CPP check Related Results
+                CppCheckResults results = new CppCheckResults();
+                try {
+                    results.runCppCheck(cppCheckCommandStyleAll);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            for(int i = 0 ; i <tableRow.size(); i++){
+                data[i][0]= tableRow.get(i).getText().replaceAll("assignsubmission_file_.cpp"," ").replaceAll("assignment"," ");
+
+            }
+            DefaultTableModel tableModel = new DefaultTableModel(data, new String [] {"Pairs"} );
+            jTable1.setModel(tableModel);
+            scrollPane.setViewportView(jTable1);
+
+            panel.add(options,BoxLayout.X_AXIS);
+            panel.add(analysis,BoxLayout.X_AXIS);
+            panel.add(cpp,BoxLayout.X_AXIS);
+            panel.add(scrollPane);
+            setLocationRelativeTo(null);
+            pack();
+
         }
     }
     class CppCheckResults extends JFrame{

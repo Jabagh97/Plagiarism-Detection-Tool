@@ -26,7 +26,7 @@ public class MainFrameV2 extends BaseSampleFrame {
 //------------------------------------------------------------------------------
         try {
             // Select the Look and Feel
-           UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
+            UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {

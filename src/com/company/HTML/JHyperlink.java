@@ -29,7 +29,7 @@ public class JHyperlink extends JLabel {
         super(text);
         this.url = url;
 
-        setForeground(Color.BLUE.darker());
+        setForeground(Color.red.darker());
 
         setToolTipText(tooltip);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

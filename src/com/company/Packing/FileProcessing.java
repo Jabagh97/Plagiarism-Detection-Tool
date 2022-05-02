@@ -2,6 +2,7 @@ package com.company.Packing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 /*
 Processing Steps:
@@ -12,6 +13,7 @@ Processing Steps:
 
 */
 public class FileProcessing {
+    Vector<String> bad = new Vector<>();
     String temp="";
     String path ;
     String modifiedPath;
@@ -25,6 +27,7 @@ public class FileProcessing {
         File dir = new File(modifiedPath);
         traverseUnzip(dir);
         changNames(dir);
+        bad = unzipping.getBadSubmission();
         System.out.println("Unzipping DONE");
     }
      void traverseUnzip(File dir) throws NullPointerException, IOException {
@@ -72,5 +75,8 @@ public class FileProcessing {
                  dir.renameTo(new File(finalName));
              }
          }
+    }
+    public Vector<String> getBadSubmissions(){
+        return bad;
     }
 }

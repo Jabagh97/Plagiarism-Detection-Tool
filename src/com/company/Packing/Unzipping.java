@@ -1,15 +1,13 @@
 package com.company.Packing;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Unzipping {
     private static final int BUFFER_SIZE = 8192;
+    private Vector<String> bad = new Vector<>() ;
     public void unzip(String zipFilePath, String destDirectory) throws IOException{
         File destDir = new File(destDirectory);
         if (!destDir.exists()) {
@@ -25,6 +23,7 @@ public class Unzipping {
                 // if the entry is a file, extracts it
                 if((entry.getName().contains("._"))||entry.getName().contains("x64")||entry.getName().contains("hw")||entry.getName().contains("github")||entry.getName().contains("debug")||entry.getName().contains("HW")||entry.getName().contains("CS")||entry.getName().contains("cs")){
                     System.out.println("Bad Submission :  " + filePath.substring(0,filePath.indexOf('_')));
+                    bad.add(filePath.substring(0,filePath.indexOf('_')));
                     break;
                 }
                 extractFile(zipIn, filePath);
@@ -49,5 +48,8 @@ public class Unzipping {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+    public Vector<String> getBadSubmission (){
+        return bad;
     }
 }
