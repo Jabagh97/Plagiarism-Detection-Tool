@@ -113,7 +113,7 @@ public class BaseSampleFrame extends JFrame {
         setJMenuBar(menuBar);
         // Setup widgets
         // Create a list with all look and feels we want to test
-        lafList = new JList();
+        lafList = new JList(Constants.LAF_NAMES);
         lafList.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         lafList.setSelectedIndex(0);
         lafList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -142,16 +142,8 @@ public class BaseSampleFrame extends JFrame {
             }
         };
         lafList.addListSelectionListener(lafListener);
-        JLabel label = new JLabel("<html>1- Press Organize button and Select the submissions zip file<br/>" +
-                "then files will be processed and organized in separate folders <br/>" +
-                "<br/>" +
-                "2- Select processed files and run MOSS <br/>" +
-                "<br/>" +
-                "3- Enter a threshold <br/>" +
-                "<br/>" +
-                "4- Clicking on any of the links will run the Analysis tool for those pairs and view similarities results");
-        JScrollPane lafScrollPane = new JScrollPane(label);
-        lafScrollPane.setBorder(new TitleBorder("Instructions"));
+        JScrollPane lafScrollPane = new JScrollPane(lafList);
+        lafScrollPane.setBorder(new TitleBorder("Instructions & Themes "));
         lafScrollPane.setMinimumSize(new Dimension(120, 80));
 
         contentPanel = new JPanel(new BorderLayout());
@@ -181,11 +173,15 @@ public class BaseSampleFrame extends JFrame {
         try {
             Properties props = getLAFProps();
             switch (selectedLaf) {
-                case 1 :
+                case Constants.LAF_NOIRE :
+                    com.jtattoo.plaf.noire.NoireLookAndFeel.setTheme(props);
+                    UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
+                    break;
+                case Constants.LAF_ALUMINIUM :
+                    com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme(props);
+                    UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
+                    break;
 
-                    break;
-                case 2 :
-                    break;
             }
             // Tell all components that look and feel has changed.
             Window windows[] = Window.getWindows();
@@ -283,9 +279,14 @@ public class BaseSampleFrame extends JFrame {
                             FileProcessing fileProcessing = new FileProcessing(path);
                             tableRow =fileProcessing.getBadSubmissions();
                             setPanel();
+                            JOptionPane.showMessageDialog(BaseSampleFrame.this,
+                                    "Files extracted to : " + fileProcessing.getDestDirectory(),
+                                    "Done",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
+
                     }
                     fileNames="";
                 }
@@ -308,7 +309,18 @@ public class BaseSampleFrame extends JFrame {
                     moss = new PlagiarismDetection();
                 }
             });
-            clear.setText("Test");
+            clear.setText("<html>Run last<br/>results(Offline)");
+            clear.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        moss.runOffline();
+
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
             this.setLayout(layout);
             layout.setHorizontalGroup(

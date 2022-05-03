@@ -79,4 +79,7 @@ public class FileProcessing {
     public Vector<String> getBadSubmissions(){
         return bad;
     }
+    public String getDestDirectory (){
+        return destDirectory;
+    }
 }

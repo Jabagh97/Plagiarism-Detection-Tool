@@ -59,6 +59,7 @@ class Pairs {
     int getLineMatched(){return lineMatched;}
 }
 public class PlagiarismDetection {
+    Boolean offline = false;
     public String fileNames="";
     String url = "";
     String path = "";
@@ -200,8 +201,7 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-
-        // execute();
+         execute();
          if(!commandOutput.contains("No such file or directory")) {
              //Delete Moss scripts from folder when analysis is done
              File dirDelete = new File(path + "\\moss.pl");
@@ -215,6 +215,13 @@ public class PlagiarismDetection {
              System.out.println("ADD MOSS Script to the files directory");
          }
      }
+     public void runOffline() throws IOException {
+        offline = true;
+         handleHtml();
+         generatePairs();
+         organizingPairs();
+         MossResults mossResults = new MossResults();
+     }
     class MossResults extends JFrame {
         JButton next = new JButton("Next");
         JTextField threshHold = new JTextField("Threshold");
@@ -222,6 +229,8 @@ public class PlagiarismDetection {
         public MossResults() {
             initUI();
             setVisible(true);
+            setSize(1000, 1000);
+            setLocationRelativeTo(null);
         }
         private void initUI() {
             JPanel panel = new JPanel();
@@ -230,13 +239,11 @@ public class PlagiarismDetection {
             JFreeChart chart = createChart(dataset);
             chart.setBackgroundPaint(Color.lightGray);
             ChartPanel chartPanel = new ChartPanel(chart);
-            chartPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             chartPanel.setBackground(Color.darkGray);
-            panel.add(chartPanel);
+            panel.add(chartPanel,BoxLayout.X_AXIS);
             setTitle("MOSS chart");
-            setLocationRelativeTo(null);
-            panel.add(next);
-            panel.add(threshHold);
+            panel.add(next,BoxLayout.X_AXIS);
+            panel.add(threshHold,BoxLayout.X_AXIS);
             pack();
             next.addActionListener(new ActionListener() {
                 @Override
@@ -296,29 +303,22 @@ public class PlagiarismDetection {
                 public void mouseClicked(MouseEvent e) {
 
                 }
-
                 @Override
                 public void mousePressed(MouseEvent e) {
 
                 }
-
                 @Override
                 public void mouseReleased(MouseEvent e) {
 
                 }
-
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    String tip ="<html>Enable All :<br/>  Enable all checks.<br/>" +
-                            "Bug Hunting :<br/> Enable noisy and soundy analysis <br/>" ;
-
+                    String tip ="<html>Enable All :<br/>  Enable all analysis checks.<br/>" +
+                                "Bug Hunting :<br/> Search for bugs <br/>" ;
                     analysis.setToolTipText(tip);
-
                 }
-
                 @Override
                 public void mouseExited(MouseEvent e) {
-
                 }
             });
             //ADD files and descriptions here after getting the threshold.
@@ -391,19 +391,21 @@ public class PlagiarismDetection {
         public void execute(String command) throws Exception {
             //System.out.println(cppCheckCommandStyleAll);
             //System.out.println(filesPathCommand);
-            ProcessBuilder builder = new ProcessBuilder( "cmd.exe", "/c", command);
-            builder.directory(new File(filesPathCommand));
-            builder.redirectErrorStream(true);
-            Process p = builder.start();
-            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while (true) {
-                line = r.readLine();
-                if (line == null) { break; }
-                System.out.println(line);
-                cppCommandOutput = cppCommandOutput + line + "<br/>";
-            }
-            cppCommandOutput +="</html>";
+                ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
+                builder.directory(new File(filesPathCommand));
+                builder.redirectErrorStream(true);
+                Process p = builder.start();
+                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line;
+                while (true) {
+                    line = r.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    System.out.println(line);
+                    cppCommandOutput = cppCommandOutput + line + "<br/>";
+                }
+                cppCommandOutput += "</html>";
         }
         public void createWindow(){
             JPanel panel = new JPanel();
@@ -418,6 +420,7 @@ public class PlagiarismDetection {
             createWindow();
         }
     }
-}
+    }
+
 
 
