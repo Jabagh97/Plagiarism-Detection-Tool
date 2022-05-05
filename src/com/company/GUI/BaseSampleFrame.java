@@ -83,7 +83,6 @@ public class BaseSampleFrame extends JFrame {
                     moss.setFilesName(fileNames);
                     moss.setPath(path);
                     JOptionPane.showMessageDialog(BaseSampleFrame.this, "You Selected : " + Arrays.stream(fc.getSelectedFiles()).count()+ " Files");
-                    fileNames = "";
                 }
             }
         });
@@ -214,16 +213,13 @@ public class BaseSampleFrame extends JFrame {
         public Vector<String> tableRow = new Vector<String>();
         Object [][]data = new Object[100][1] ;
 
-
         public ScrollPaneSamplePanel() {
             initComponents();
         }
         public void setPanel (){
             for(int i = 0 ; i <tableRow.size(); i++){
                 data[i][0]= tableRow.get(i);
-
             }
-
             DefaultTableModel tableModel = new DefaultTableModel(data, new String [] {"Please Extract those submissions Manually "} );
            jTable1.setModel(tableModel);
             //tableModel.addRow(tableRow);
@@ -253,8 +249,6 @@ public class BaseSampleFrame extends JFrame {
             langSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "C++", "Java"}));
             pairs.setText("Bad Submissions : ");
             jScrollPane1.getViewport().setBackground(Color.gray);
-
-
             jScrollPane1.setViewportView(jTable1);
 
             organize.setText("Process Zip File");
@@ -314,7 +308,8 @@ public class BaseSampleFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        moss.runOffline();
+                        moss.runOffline(path);
+                        moss=new PlagiarismDetection();
 
                     } catch (IOException ex) {
                         ex.printStackTrace();

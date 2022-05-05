@@ -26,8 +26,12 @@ public class Constants {
                     "<br/>" +
                     "<br/>" +
                     "IMPORTANT!! <br/> <br/>" +
-                    "1- You need to add cppCheck as Environmental variable and install Strawberry perl in order to use the tool<br/><br/>" +
-                    "2- Bad submission needs to be extracted and processed manually by user <br/>due to some unpredictable content of some student's submissions "};
+                    "1- You need to add cppCheck as Environmental variable and <br/>install Strawberry perl in order to use the tool<br/><br/>" +
+                    "2- Bad submission needs to be extracted and processed manually by user <br/>due to some unpredictable content of some student's submissions" +
+                    "<br/> <br/>" +
+                    " TIP!" +
+                    "<br/> <br/>" +
+                    "Add submissions from previous years to the processed folders"};
 
 
 }
