@@ -5,8 +5,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
 public class JHyperlink extends JLabel {
@@ -48,16 +46,25 @@ public class JHyperlink extends JLabel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+
+                JFrame f = new JFrame("Moss Page");
+                JEditorPane jep = new JEditorPane();
+                jep.setEditable(false);
                 try {
-
-                    Desktop.getDesktop().browse(new URI(JHyperlink.this.url));
-
-                } catch (IOException | URISyntaxException e1) {
+                    jep.setPage(JHyperlink.this.url);
+                  //  Desktop.getDesktop().browse(new URI(JHyperlink.this.url));
+                } catch (IOException  e1) {
                     JOptionPane.showMessageDialog(JHyperlink.this,
                             "Could not open the hyperlink. Error: " + e1.getMessage(),
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
+                JScrollPane scrollPane = new JScrollPane(jep);
+                f.getContentPane().add(scrollPane);
+                f.setPreferredSize(new Dimension(1000,800));
+                f.setVisible(true);
+                f.pack();
+                f.setLocationRelativeTo(null);
             }
 
         });

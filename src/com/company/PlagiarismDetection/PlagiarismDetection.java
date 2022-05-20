@@ -12,7 +12,10 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +76,7 @@ public class PlagiarismDetection {
                     ,"cppcheck --enable=information"
                     ,"cppcheck --enable=unusedFunction"
                     ,"cppcheck --verbose"};
-    String cppChosen ="cppcheck --enable=all";
+    String cppChosen ="cppcheck --bug-hunting";
     String cppCheckCommandSAll;
     public Parser parser = new Parser();
     ArrayList<String> namesList = new ArrayList<>();
@@ -88,7 +91,6 @@ public class PlagiarismDetection {
     String output = null;
     int temp =0 ;
     public int [] chartOutput = {0,0,0,0,0,0,0,0,0,0,0};
-
     //Parsing Command Output
     public void execute() throws Exception {
         //System.out.println(filesPathCommand);
@@ -210,7 +212,7 @@ public class PlagiarismDetection {
          mossCommand += fileNames;
 
          //running MOSS
-         // execute();
+          execute();
          if(!commandOutput.contains("No such file or directory")) {
              //Delete Moss scripts from folder when analysis is done
              File dirDelete = new File(path + "\\moss.pl");
@@ -282,17 +284,14 @@ public class PlagiarismDetection {
                         System.out.println(cppChosen);
                     }
                    if(selected.contains("cppcheck --enable=information")){
-
                         cppChosen = cppComboBox[6];
                         System.out.println(cppChosen);
                     }
                     if(selected.contains("cppcheck --enable=unusedFunction")){
-
                         cppChosen = cppComboBox[7];
                         System.out.println(cppChosen);
                     }
                     if(selected.contains("cppcheck --verbose")){
-
                         cppChosen = cppComboBox[8];
                         System.out.println(cppChosen);
                     }
@@ -302,9 +301,18 @@ public class PlagiarismDetection {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     //Create a new window
+
                     thresholdText = Integer.parseInt(threshHold.getText());
+                    if(thresholdText > 100 || thresholdText < 0){
+                        JOptionPane.showMessageDialog(MossResults.this,
+                                "Please Enter a valid Number (0-100)",
+                                "error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    else{
                     thresholdPairs thresholdPairs = new thresholdPairs(thresholdText);
                     thresholdPairs.setSize(1000,800);
+                    }
                 }
             });
             panel.add(chartPanel,BoxLayout.X_AXIS);
@@ -389,7 +397,6 @@ public class PlagiarismDetection {
                                 ex.printStackTrace();
                             }
                         }
-
                         @Override
                         public void mousePressed(MouseEvent e) {
                         }
@@ -406,7 +413,6 @@ public class PlagiarismDetection {
                         public void mouseExited(MouseEvent e) {
                         }
                     });
-
                     int lines = filePairs.get(i).lineMatched;
                     String clearName = filePairs.get(i).file1;
                     clearName = clearName.replaceAll("_assignsubmission_file_", "");
@@ -421,8 +427,6 @@ public class PlagiarismDetection {
                     cppCheckCommandSAll = cppCheckCommandSAll + " " + filePairs.get(i).file1 + " " + filePairs.get(i).getFile2();
                 }
                     // System.out.println(cppCheckCommandStyle);
-
-
             }
             cpp.addActionListener(e1 -> {
                 //CPP check Related Results
@@ -441,8 +445,8 @@ public class PlagiarismDetection {
             scrollPane.setViewportView(jTable1);
             panel.add(cpp,BoxLayout.X_AXIS);
             panel.add(scrollPane);
-            setLocationRelativeTo(null);
             pack();
+            setLocationRelativeTo(null);
         }
     }
     class CppCheckResults extends JFrame{

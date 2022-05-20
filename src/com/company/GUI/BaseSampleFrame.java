@@ -1,9 +1,5 @@
 package com.company.GUI;
-/*
- * JTattoo BaseSampleFrame (c) 2013 by MH Software-Entwicklung
- *
- * A base frame class for most of the sample applications.
- */
+
 
 import com.company.HTML.Parser;
 import com.company.Packing.FileProcessing;
@@ -33,7 +29,6 @@ public class BaseSampleFrame extends JFrame {
     public Parser parser = new Parser();
     String projectPath = System.getProperty("user.dir") + "\\moss.pl";
 
-    // A list of possible look and feels
     protected JList lafList = null;
     protected int selectedLaf = 0;
     protected ListSelectionListener lafListener = null;
@@ -180,7 +175,10 @@ public class BaseSampleFrame extends JFrame {
                     com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme(props);
                     UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
                     break;
-
+                case Constants.LAF_LUNA:
+                    com.jtattoo.plaf.texture.TextureLookAndFeel.setTheme(props);
+                    UIManager.setLookAndFeel("com.jtattoo.plaf.texture.TextureLookAndFeel");
+                    break;
             }
             // Tell all components that look and feel has changed.
             Window windows[] = Window.getWindows();
@@ -296,7 +294,15 @@ public class BaseSampleFrame extends JFrame {
                                     "error",
                                     JOptionPane.ERROR_MESSAGE);
                         }
-                        else{moss.runMoss();}
+                        else{
+                            JOptionPane.showMessageDialog(BaseSampleFrame.this,
+                                    "<html>Checking Files Please Wait <br/> <br/>" +
+                                            "MOSS results may delay because of server status <br/><br/>"+
+                                            "If it is taking a long time try again later<br/>",
+                                    "Running",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            moss.runMoss();
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
